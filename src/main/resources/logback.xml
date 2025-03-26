@@ -1,0 +1,25 @@
+<configuration>
+    <!-- Определяем appender для записи в файл -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <!-- Указываем путь к файлу, куда будут записываться логи -->
+        <file>logs/myapp.log</file>
+        <!-- Указываем кодировку (по умолчанию UTF-8) -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Определяем appender для вывода в консоль (опционально) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Настраиваем корневой логгер -->
+    <root level="info">
+        <!-- Подключаем оба appender'а (в файл и в консоль) -->
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
