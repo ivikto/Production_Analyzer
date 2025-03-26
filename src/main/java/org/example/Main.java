@@ -3,7 +3,6 @@ package org.example;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class Main {
     @Autowired
     private Main main;
     @Autowired
-    private Request request;
+    private MyURL myURL;
     public static List<ZNP> znpList = new ArrayList<>();
     //Поле для подсчета нарушений по производствам
     public static int violation = 0;
@@ -71,10 +70,13 @@ public class Main {
 //            calculateTime(znp);
 //        }
 //        System.out.printf("Нарушены сроки по %d из %d производств", violation, znpList.size());
-        Request request = context.getBean(Request.class);
-        request.setUrl(DocType.Catalog_Номенклатура);
-
-
+        MyURL myURL = context.getBean(MyURL.class);
+        String url = myURL.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", "79d47d54-1416-11ee-ab52-e60ffe1e29e4");
+        System.out.println(url);
+        MyRequest request = context.getBean(MyRequest.class);
+        String response = request.doRequest(url);
+        System.out.println(response);
+        System.out.println(request.getResponseCode());
 
 
     }
