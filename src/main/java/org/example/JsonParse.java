@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class JsonParse {
     @Getter
-    private static List<ZNP> znpList = new ArrayList<>();
+    private List<ZNP> znpList = new ArrayList<>();
     private MyRequest request;
     private TimeCalc timeCalc;
     private MyURL url;
@@ -28,7 +28,7 @@ public class JsonParse {
     }
 
     //Парсим и находим значением полей производсв со статусом - В работе
-    public void jsonParseProd(String json) throws JsonProcessingException {
+    public void jsonParseProd(String json, Period period) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootArray = objectMapper.readTree(json);
@@ -55,7 +55,7 @@ public class JsonParse {
 
             }
             LocalDateTime dateTime = LocalDateTime.parse(date);
-            if (timeCalc.checkDate(dateTime)) {
+            if (timeCalc.checkDate(dateTime, period)) {
                 ZNP znp = new ZNP();
                 znp.setRef_key(refkey);
                 znp.setNumber(number);

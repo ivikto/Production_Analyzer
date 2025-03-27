@@ -55,6 +55,8 @@ public class Main {
     private TimeCalc timeCalc;
     @Autowired
     private MyRequest myRequest;
+    @Autowired
+    private ZNP znp;
 
     public static List<ZNP> znpList = new ArrayList<>();
     //Поле для подсчета нарушений по производствам
@@ -73,39 +75,25 @@ public class Main {
         ApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
         Main main = context.getBean(Main.class);
         main.run();
-
-//        try {
-//            String json = main.requestProd();
-//            main.jsonParseProd(json);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        for (ZNP znp : znpList) {
-//            calculateTime(znp);
-//        }
-//        System.out.printf("Нарушены сроки по %d из %d производств", violation, znpList.size());
-//        System.out.println();
-//        excelWrite.createExcel(znpList);
     }
 
-        public void run() {
+    public void run() {
         String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, "СостояниеЗаказа_Key", "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
         System.out.println(url);
 
-        String response = myRequest.doRequest(url);
-        System.out.println(myRequest.getResponseCode());
-
         try {
-            jsonParse.jsonParseProd(response);
+            jsonParse.jsonParseProd(myRequest.doRequest(url), Period.Month);
+            System.out.println("Код ответа сервера: " + myRequest.getResponseCode());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         znpList = jsonParse.getZnpList();
         for (ZNP znp : znpList) {
             TimeCalc.calculateTime(znp);
+            Output.printResult(znp);
         }
-        System.out.printf("Нарушены сроки по %d из %d производств", TimeCalc.getViolation(), znpList.size());
 
+        Output.printRatio();
         excelWrite.createExcel(znpList);
     }
 }

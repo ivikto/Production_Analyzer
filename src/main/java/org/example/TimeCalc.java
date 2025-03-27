@@ -15,9 +15,22 @@ public class TimeCalc {
     @Getter
     public static int violation = 0;
 
-    public boolean checkDate(LocalDateTime date) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime pastDate = now.minusYears(1);
+    public boolean checkDate(LocalDateTime date, Period period) {
+        LocalDateTime pastDate = LocalDateTime.now();
+
+        switch (period) {
+            case Year:
+                pastDate = LocalDateTime.now().minusYears(1);
+                break;
+            case Month:
+                pastDate = LocalDateTime.now().minusMonths(1);
+                break;
+            case Quarter:
+                pastDate = LocalDateTime.now().minusMonths(3);
+                break;
+
+
+        }
         if (date.isBefore(pastDate)) {
             return false;
         } else {
@@ -92,19 +105,11 @@ public class TimeCalc {
 
             if (LocalDateTime.now().isAfter(deadline)) {
                 znp.setViolation(true);
-                System.out.println(znp.getNumber() + " Создан: " + formatDateTime(start) +
-                        " Должен быть завершен: " + formatDateTime(deadline) +
-                        " Времени выделено: " + znp.getTotalTime() + " часа" +
-                        " НАРУШЕНИЕ" +
-                        " Изделия: " + znp.getList());
-                violation++;
+
+                znp.violation_count++;
             } else {
                 znp.setViolation(false);
-                System.out.println(znp.getNumber() + " Создан: " + formatDateTime(start) +
-                        " Должен быть завершен: " + formatDateTime(deadline) +
-                        " Времени выделено: " + znp.getTotalTime() + " часа" +
-                        " НОРМА" +
-                        " Изделия: " + znp.getList());
+
             }
         } catch (Exception e) {
             System.err.println("Ошибка при расчете времени для " + znp.getNumber() + ": " + e.getMessage());
