@@ -14,7 +14,9 @@ public class ZNP {
     private String number;
     private Double totalTime;
     private LocalDateTime date;
+    private LocalDateTime deadline;
     private List<String> list = new ArrayList<>();
+    private boolean violation;
 
 
 

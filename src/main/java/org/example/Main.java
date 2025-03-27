@@ -33,9 +33,9 @@ import java.util.List;
 @Component
 @PropertySource("classpath:jsonPars.properties")
 public class Main {
-    @Value(value = "${jsonPars.login}")
+    @Value(value = "${login}")
     private String login; // Логин и пароль
-    @Value(value = "${jsonPars.pass}")
+    @Value(value = "${pass}")
     private String pass; // Логин и пароль
     private String auth = login + ":" + pass;
     private String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
@@ -43,6 +43,8 @@ public class Main {
     private Main main;
     @Autowired
     private MyURL myURL;
+    @Autowired
+    private ExcelWrite excelWrite;
     public static List<ZNP> znpList = new ArrayList<>();
     //Поле для подсчета нарушений по производствам
     public static int violation = 0;
@@ -59,24 +61,28 @@ public class Main {
     public static void main(String[] args) {
         ApplicationContext context = new AnnotationConfigApplicationContext("org.example");
         Main main = context.getBean(Main.class);
+        ExcelWrite excelWrite = context.getBean(ExcelWrite.class);
 
-//        try {
-//            String json = main.requestProd();
-//            main.jsonParseProd(json);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        for (ZNP znp : znpList) {
-//            calculateTime(znp);
-//        }
-//        System.out.printf("Нарушены сроки по %d из %d производств", violation, znpList.size());
-        MyURL myURL = context.getBean(MyURL.class);
-        String url = myURL.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", "79d47d54-1416-11ee-ab52-e60ffe1e29e4");
-        System.out.println(url);
-        MyRequest request = context.getBean(MyRequest.class);
-        String response = request.doRequest(url);
-        System.out.println(response);
-        System.out.println(request.getResponseCode());
+        try {
+            String json = main.requestProd();
+            main.jsonParseProd(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (ZNP znp : znpList) {
+            calculateTime(znp);
+        }
+        System.out.printf("Нарушены сроки по %d из %d производств", violation, znpList.size());
+        System.out.println();
+        excelWrite.createExcel(znpList);
+
+//        MyURL myURL = context.getBean(MyURL.class);
+//        String url = myURL.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", "79d47d54-1416-11ee-ab52-e60ffe1e29e4");
+//        System.out.println(url);
+//        MyRequest request = context.getBean(MyRequest.class);
+//        String response = request.doRequest(url);
+//        System.out.println(response);
+//        System.out.println(request.getResponseCode());
 
 
     }
@@ -120,7 +126,7 @@ public class Main {
         String line = "";
         StringBuilder response = new StringBuilder();
         String numeric = URLEncoder.encode("Номенклатура", StandardCharsets.UTF_8);
-        String baseUrl = "https://1c.svs-tech.pro/UNF/odata/standard.odata/Catalog_" + numeric + "?$filter=Ref_Key%20eq%20guid%27" +ref + "%27&$format=json";
+        String baseUrl = "https://1c.svs-tech.pro/UNF/odata/standard.odata/Catalog_" + numeric + "?$filter=Ref_Key%20eq%20guid%27" + ref + "%27&$format=json";
         //url sample: https://1c.svs-tech.pro/UNF/odata/standard.odata/Document_ЗаказНаПроизводство?$filter=СостояниеЗаказа_Key%20eq%20guid%274f5e06a1-5f73-11ed-a1fd-d2166770609f%27&$format=json
 
         //System.out.println(baseUrl);
@@ -190,14 +196,17 @@ public class Main {
 
             }
             //System.out.printf("Ref_Key: %s Number: %s Date: %s Нормочасы: %f\n", refkey, number, date, time);
-            ZNP znp = new ZNP();
-            znp.setRef_key(refkey);
-            znp.setNumber(number);
-            znp.setTotalTime(time);
             LocalDateTime dateTime = LocalDateTime.parse(date);
-            znp.setDate(dateTime);
-            znp.setList(list);
-            znpList.add(znp);
+            if (checkDate(dateTime)) {
+                ZNP znp = new ZNP();
+                znp.setRef_key(refkey);
+                znp.setNumber(number);
+                znp.setTotalTime(time);
+                znp.setDate(dateTime);
+                znp.setList(list);
+
+                znpList.add(znp);
+            }
         }
     }
 
@@ -205,12 +214,14 @@ public class Main {
     public static void calculateTime(ZNP znp) {
         try {
             // Получаем общее время в минутах
-            long totalMinutes = (long)(znp.getTotalTime() * 60);
+            long totalMinutes = (long) (znp.getTotalTime() * 60);
 
             LocalDateTime start = znp.getDate();
             LocalDateTime deadline = calculateWorkingDeadline(start, totalMinutes);
+            znp.setDeadline(deadline);
 
             if (LocalDateTime.now().isAfter(deadline)) {
+                znp.setViolation(true);
                 System.out.println(znp.getNumber() + " Создан: " + formatDateTime(start) +
                         " Должен быть завершен: " + formatDateTime(deadline) +
                         " Времени выделено: " + znp.getTotalTime() + " часа" +
@@ -218,6 +229,7 @@ public class Main {
                         " Изделия: " + znp.getList());
                 violation++;
             } else {
+                znp.setViolation(false);
                 System.out.println(znp.getNumber() + " Создан: " + formatDateTime(start) +
                         " Должен быть завершен: " + formatDateTime(deadline) +
                         " Времени выделено: " + znp.getTotalTime() + " часа" +
@@ -283,5 +295,15 @@ public class Main {
 
     private static String formatDateTime(LocalDateTime dateTime) {
         return dateTime.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    }
+
+    private boolean checkDate(LocalDateTime date) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime pastDate = now.minusMonths(1);
+        if (date.isBefore(pastDate)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
