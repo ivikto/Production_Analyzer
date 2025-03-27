@@ -14,18 +14,19 @@ public class Output {
     public static void printResult(ZNP znp) {
         double rounded = Math.round(znp.getTotalTime() * 1000.0) / 1000.0;
         if (znp.isViolation()) {
-
-            log.info(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
+            String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
                     " Времени выделено: " + rounded + " часа" +
                     " НАРУШЕНИЕ" +
                     " Изделия: " + znp.getList());
+            log.info(str);
         } else {
-            log.info(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
+            String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
                     " Времени выделено: " + rounded + " часа" +
                     " НОРМА" +
                     " Изделия: " + znp.getList());
+            log.info(str);
         }
     }
     public void printRatio(List<ZNP> znpList) {

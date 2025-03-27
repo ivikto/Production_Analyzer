@@ -20,7 +20,7 @@ public class ExcelWrite {
     public void createExcel(List<ZNP> znpList) {
         try {
             writeToExcel(znpList);
-            System.out.println("Файл успешно создан.");
+            log.info("Файл успешно создан.");
         } catch (IOException e) {
             log.error(e.getMessage());
         }

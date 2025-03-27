@@ -51,7 +51,7 @@ public class Main {
 
         log.info("main run");
         String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, "СостояниеЗаказа_Key", "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
-        log.info("url: " + url);
+        log.info(url);
         String response = myRequest.doRequest(url);
         jsonParse.jsonParseProd(response, Period.Month);
         znpList = jsonParse.getZnpList();
