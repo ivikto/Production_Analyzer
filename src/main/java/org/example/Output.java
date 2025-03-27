@@ -11,7 +11,7 @@ import static org.example.TimeCalc.formatDateTime;
 @Component
 public class Output {
 
-    public static void printResult(ZNP znp) {
+    public void printResult(ZNP znp) {
         double rounded = Math.round(znp.getTotalTime() * 1000.0) / 1000.0;
         if (znp.isViolation()) {
             String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +

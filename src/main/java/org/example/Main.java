@@ -9,6 +9,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 @Slf4j
@@ -48,6 +50,7 @@ public class Main {
     }
 
     public void run() {
+        LocalTime now = LocalTime.now();
 
         log.info("main run");
         String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, "СостояниеЗаказа_Key", "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
@@ -57,10 +60,15 @@ public class Main {
         znpList = jsonParse.getZnpList();
         for (ZNP znp : znpList) {
             TimeCalc.calculateTime(znp);
-            Output.printResult(znp);
+            output.printResult(znp);
         }
 
         output.printRatio(znpList);
         excelWrite.createExcel(znpList);
+
+        LocalTime finish = LocalTime.now();
+        Duration duration = Duration.between(now, finish);
+        log.info("Продолжительность операции: " + duration.toSeconds() + " сек");
+
     }
 }
