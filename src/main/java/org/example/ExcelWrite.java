@@ -15,7 +15,7 @@ public class ExcelWrite {
     private static String filePath = "C:\\Java\\Production_Analyzer\\prod_data.xlsx";
 
 
-    public static void createExcel(List<ZNP> znpList) {
+    public void createExcel(List<ZNP> znpList) {
         try {
             writeToExcel(znpList, filePath);
             System.out.println("Файл успешно создан.");
@@ -24,7 +24,7 @@ public class ExcelWrite {
         }
     }
     // Метод для записи данных в Excel
-    private static void writeToExcel(List<ZNP> znpList, String fileName) throws IOException {
+    private void writeToExcel(List<ZNP> znpList, String fileName) throws IOException {
         // Создаем новую книгу Excel
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Производства за месяц");

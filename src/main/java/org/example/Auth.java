@@ -20,6 +20,7 @@ public class Auth {
     private String pass; // Логин и пароль
     @Getter
     private String auth = login + ":" + pass;
+    @Getter
     private String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
     private final Environment environment;
 

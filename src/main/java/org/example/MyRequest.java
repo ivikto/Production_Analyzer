@@ -21,8 +21,13 @@ public class MyRequest {
     public static Logger log = LoggerFactory.getLogger(Main.class);
     private URL url;
     private int responseCode;
-    @Autowired
     private Auth auth;
+
+    @Autowired
+    public MyRequest(Auth auth) {
+        this.auth = auth;
+    }
+
 
     public String doRequest(String myUrl) {
         StringBuilder response = new StringBuilder();
@@ -32,7 +37,7 @@ public class MyRequest {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            log.info("Login: " + auth.getAuth());
+            //log.info("Login: " + auth.getAuth());
 
             connection.setRequestProperty("Authorization", "Basic " + auth.getAuthInfo());
 
