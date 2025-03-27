@@ -2,13 +2,14 @@ package org.example;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Getter
 @Setter
 @Component

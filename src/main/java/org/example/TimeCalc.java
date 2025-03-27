@@ -1,6 +1,7 @@
 package org.example;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -10,32 +11,21 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Component
 public class TimeCalc {
     @Getter
     public static int violation = 0;
 
     public boolean checkDate(LocalDateTime date, Period period) {
-        LocalDateTime pastDate = LocalDateTime.now();
+        LocalDateTime.now();
+        LocalDateTime pastDate = switch (period) {
+            case Year -> LocalDateTime.now().minusYears(1);
+            case Month -> LocalDateTime.now().minusMonths(1);
+            case Quarter -> LocalDateTime.now().minusMonths(3);
+        };
 
-        switch (period) {
-            case Year:
-                pastDate = LocalDateTime.now().minusYears(1);
-                break;
-            case Month:
-                pastDate = LocalDateTime.now().minusMonths(1);
-                break;
-            case Quarter:
-                pastDate = LocalDateTime.now().minusMonths(3);
-                break;
-
-
-        }
-        if (date.isBefore(pastDate)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !date.isBefore(pastDate);
     }
 
     public static LocalDateTime calculateWorkingDeadline(LocalDateTime start, long remainingMinutes) {
@@ -106,7 +96,7 @@ public class TimeCalc {
             if (LocalDateTime.now().isAfter(deadline)) {
                 znp.setViolation(true);
 
-                znp.violation_count++;
+                ZNP.violation_count++;
             } else {
                 znp.setViolation(false);
 

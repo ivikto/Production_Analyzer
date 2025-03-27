@@ -1,47 +1,40 @@
 package org.example;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.example.TimeCalc.formatDateTime;
 
+@Slf4j
 @Component
 public class Output {
 
-    private static TimeCalc timeCalc;
-    private static Main main;
-    private static ZNP znp;
-
-    @Autowired
-    public Output(TimeCalc timeCalc) {
-        this.timeCalc = timeCalc;
-        this.main = main;
-        this.znp = znp;
-    }
-
-
     public static void printResult(ZNP znp) {
+        double rounded = Math.round(znp.getTotalTime() * 1000.0) / 1000.0;
         if (znp.isViolation()) {
-            System.out.println(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
+
+            log.info(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
-                    " Времени выделено: " + znp.getTotalTime() + " часа" +
+                    " Времени выделено: " + rounded + " часа" +
                     " НАРУШЕНИЕ" +
                     " Изделия: " + znp.getList());
         } else {
-            System.out.println(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
+            log.info(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
-                    " Времени выделено: " + znp.getTotalTime() + " часа" +
+                    " Времени выделено: " + rounded + " часа" +
                     " НОРМА" +
                     " Изделия: " + znp.getList());
         }
-
-
     }
-    public static void printRatio() {
-        System.out.printf("Нарушены сроки по %d из %d производств", znp.violation_count, main.znpList.size());
-        System.out.println();
+    public void printRatio(List<ZNP> znpList) {
+        long violations = znpList.stream()
+                .filter(ZNP::isViolation)
+                .count();
+        String str = String.format("Нарушены сроки по %d из %d производств", violations, znpList.size());
+        log.info(str);
+
 
     }
 }

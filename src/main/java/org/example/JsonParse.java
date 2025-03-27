@@ -4,21 +4,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JsonParse {
     @Getter
-    private List<ZNP> znpList = new ArrayList<>();
-    private MyRequest request;
-    private TimeCalc timeCalc;
-    private MyURL url;
+    private final List<ZNP> znpList = new ArrayList<>();
+    private final MyRequest request;
+    private final TimeCalc timeCalc;
+    private final MyURL url;
+
 
     @Autowired
     public JsonParse(MyRequest request, TimeCalc timeCalc, MyURL url) {
@@ -28,21 +30,25 @@ public class JsonParse {
     }
 
     //Парсим и находим значением полей производсв со статусом - В работе
-    public void jsonParseProd(String json, Period period) throws JsonProcessingException {
+    public void jsonParseProd(String json, Period period) {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootArray = objectMapper.readTree(json);
+        JsonNode rootArray;
+        try {
+            rootArray = objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
 
         JsonNode valueArray = rootArray.get("value");
         for (JsonNode node : valueArray) {
             String refkey = node.get("Ref_Key").asText();
             String number = node.get("Number").asText();
             String date = node.get("Date").asText();
-            String productName;
 
             JsonNode operations = node.path("Операции");
-            Double time = 0d;
-            Double TotalTime = time * 60;
+            double time = 0d;
             for (JsonNode operation : operations) {
                 time += operation.get("Нормочасы").asDouble();
             }
@@ -51,7 +57,12 @@ public class JsonParse {
             JsonNode product = node.path("Продукция");
             for (JsonNode prod : product) {
                 String result = request.doRequest(url.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", prod.get("Номенклатура_Key").asText()));
-                list.add(jsonParseNum(result));
+                try {
+                    list.add(jsonParseNum(result));
+                } catch (JsonProcessingException e) {
+                    log.error(e.getMessage());
+                    throw new RuntimeException(e);
+                }
 
             }
             LocalDateTime dateTime = LocalDateTime.parse(date);
@@ -71,8 +82,7 @@ public class JsonParse {
     public String jsonParseNum(String json) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootArray = objectMapper.readTree(json.toString());
-        //System.out.println(rootArray);
+        JsonNode rootArray = objectMapper.readTree(json);
         JsonNode valueArray = rootArray.get("value");
 
         String name = "";

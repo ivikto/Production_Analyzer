@@ -1,5 +1,5 @@
 package org.example;
 
-enum Period {
+public enum Period {
     Month, Quarter, Year
 }

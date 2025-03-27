@@ -1,16 +1,16 @@
 package org.example;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Component
 @PropertySource("classpath:jsonPars.properties")
 public class Auth {
@@ -22,12 +22,6 @@ public class Auth {
     private String auth = login + ":" + pass;
     @Getter
     private String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-    private final Environment environment;
-
-    @Autowired
-    public Auth(Environment environment) {
-        this.environment = environment;
-    }
 
 
     @PostConstruct
