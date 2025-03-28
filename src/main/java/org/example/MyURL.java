@@ -10,14 +10,18 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class MyURL {
 
-    public String setUrl(DocType docType, String filterByValue, String filerGuidValue) {
+    public String setUrl(DocType docType, FieldType fieldType, String filerGuidValue) {
         String baseUrl = "https://1c.svs-tech.pro/UNF/odata/standard.odata/";
         String filter = "?$filter=";
-        filterByValue = URLEncoder.encode(filterByValue, StandardCharsets.UTF_8);
+        String filterByValue = URLEncoder.encode(fieldType.name(), StandardCharsets.UTF_8);
         String type = URLEncoder.encode(docType.name(), StandardCharsets.UTF_8);
+        String guid = " eq guid'";
 
-        String url = baseUrl + type + filter + filterByValue + " eq guid'" + filerGuidValue + "'&$format=json";
+        if (!fieldType.name().contains("Key")) {
+            guid = " eq '";
+        }
 
+        String url = baseUrl + type + filter + filterByValue + guid + filerGuidValue + "'&$format=json";
 
         return url.replaceAll(" ", "%20").replaceAll("'", "%27");
     }

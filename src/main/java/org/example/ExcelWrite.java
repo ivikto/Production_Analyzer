@@ -32,10 +32,23 @@ public class ExcelWrite {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Производства за месяц");
 
+        Font boldFont = workbook.createFont();
+        boldFont.setBold(true);
+
         // Создаем стиль для заголовков
         CellStyle headerStyle = workbook.createCellStyle();
         Font headerFont = workbook.createFont();
         headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFont(boldFont);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        // Создаем стиль данных
+        CellStyle dataStyle = workbook.createCellStyle();
+        CellStyle boldStyle = workbook.createCellStyle();
+        boldStyle.setFont(boldFont);
+        headerFont.setBold(false);
         headerStyle.setFont(headerFont);
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
         headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -53,9 +66,10 @@ public class ExcelWrite {
                 .filter(ZNP::isViolation)
                 .count();
         String str = String.format("Нарушены сроки по %d из %d производств", violations, znpList.size());
-        Row headerRow_summ = sheet.createRow(1);
+        Row headerRow_summ = sheet.createRow(0);
         Cell firtsCell = headerRow_summ.createCell(0);
         firtsCell.setCellValue(str);
+        firtsCell.setCellStyle(headerStyle);
 
 
         sheet.addMergedRegion(new CellRangeAddress(
@@ -79,17 +93,21 @@ public class ExcelWrite {
         int rowNum = 2;
         for (ZNP znp : znpList) {
             Row row = sheet.createRow(rowNum++);
+            row.setRowStyle(dataStyle);
             row.createCell(0).setCellValue(rowNum - 1);
             row.createCell(1).setCellValue(znp.getNumber());
             Cell cell2 = row.createCell(2);
             cell2.setCellStyle(dateStyle);
             cell2.setCellValue(znp.getDate());
             Cell cell3 = row.createCell(3);
-            cell3.setCellStyle(dateStyle);
+            cell3.setCellStyle(dataStyle);
             cell3.setCellValue(znp.getDeadline());
-            row.createCell(4).setCellValue(znp.getTotalTime());
+            Cell cell4 = row.createCell(4);
+            cell4.setCellStyle(dateStyle);
+            cell4.setCellValue(znp.getTotalTime());
             row.createCell(5).setCellValue(znp.isViolation());
             row.createCell(6).setCellValue(znp.getList().toString());
+            row.setRowStyle(dataStyle);
         }
 
         // Авторазмер для колонок

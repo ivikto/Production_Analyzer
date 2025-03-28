@@ -57,8 +57,8 @@ public class JsonParse {
             List<String> list = new ArrayList<>();
             JsonNode product = node.path("Продукция");
             for (JsonNode prod : product) {
-                String result = request.doRequest(url.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", prod.get("Номенклатура_Key").asText()));
-                String result2 = request.doRequest(url.setUrl(DocType.Document_СборкаЗапасов, "ЗаказНаПроизводство_Key", refkey));
+                String result = request.doRequest(url.setUrl(DocType.Catalog_Номенклатура, FieldType.Ref_Key, prod.get("Номенклатура_Key").asText()));
+                String result2 = request.doRequest(url.setUrl(DocType.Document_СборкаЗапасов, FieldType.ЗаказНаПроизводство_Key, refkey));
                 try {
                     list.add(jsonParseData(result, "НаименованиеПолное"));
                     posted = jsonParseData(result2, "Posted");

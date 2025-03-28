@@ -55,7 +55,7 @@ public class Main {
         LocalTime now = LocalTime.now();
 
         log.info("main run");
-        String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, "СостояниеЗаказа_Key", "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
+        String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, FieldType.СостояниеЗаказа_Key, "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
         log.info(url);
         String response = myRequest.doRequest(url);
         jsonParse.jsonParseProd(response, Period.Month);
