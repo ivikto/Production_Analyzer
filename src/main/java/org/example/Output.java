@@ -18,14 +18,16 @@ public class Output {
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
                     " Времени выделено: " + rounded + " часа" +
                     " НАРУШЕНИЕ" +
-                    " Изделия: " + znp.getList());
+                    " Изделия: " + znp.getList() +
+                    " Posted: " + znp.posted);
             log.info(str);
         } else {
             String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
                     " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
                     " Времени выделено: " + rounded + " часа" +
                     " НОРМА" +
-                    " Изделия: " + znp.getList());
+                    " Изделия: " + znp.getList() +
+                    " Posted: " + znp.posted);
             log.info(str);
         }
     }

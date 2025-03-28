@@ -2,6 +2,7 @@ package org.example;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
@@ -47,8 +48,26 @@ public class ExcelWrite {
         dateStyle.setAlignment(HorizontalAlignment.CENTER);
         dateStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
+        // Создаем строку с итогом
+        long violations = znpList.stream()
+                .filter(ZNP::isViolation)
+                .count();
+        String str = String.format("Нарушены сроки по %d из %d производств", violations, znpList.size());
+        Row headerRow_summ = sheet.createRow(1);
+        Cell firtsCell = headerRow_summ.createCell(0);
+        firtsCell.setCellValue(str);
+
+
+        sheet.addMergedRegion(new CellRangeAddress(
+                0,  // Начальная строка (0-based)
+                0,  // Конечная строка (та же)
+                0,  // Начальная колонка (0 = A)
+                6   // Конечная колонка (1 = B)
+        ));
+
+
         // Создаем заголовки
-        Row headerRow = sheet.createRow(0);
+        Row headerRow = sheet.createRow(1);
         String[] headers = {"№","Номер ЗНП", "Создан", "Должен быть завершен", "Нормочасов выделено", "Нарушение", "Номенклатура"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
@@ -57,7 +76,7 @@ public class ExcelWrite {
         }
 
         // Заполняем данные
-        int rowNum = 1;
+        int rowNum = 2;
         for (ZNP znp : znpList) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(rowNum - 1);

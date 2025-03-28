@@ -85,6 +85,7 @@ public class TimeCalc {
     }
 
     public static void calculateTime(ZNP znp) {
+
         try {
             // Получаем общее время в минутах
             long totalMinutes = (long) (znp.getTotalTime() * 60);
@@ -104,5 +105,6 @@ public class TimeCalc {
         } catch (Exception e) {
             System.err.println("Ошибка при расчете времени для " + znp.getNumber() + ": " + e.getMessage());
         }
+
     }
 }

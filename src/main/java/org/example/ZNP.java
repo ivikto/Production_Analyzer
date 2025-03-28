@@ -22,6 +22,8 @@ public class ZNP {
     private List<String> list = new ArrayList<>();
     private boolean violation;
     public static int violation_count = 0;
+    public boolean posted;
+    public String production;
 
 
 

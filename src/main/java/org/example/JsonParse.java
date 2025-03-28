@@ -46,6 +46,7 @@ public class JsonParse {
             String refkey = node.get("Ref_Key").asText();
             String number = node.get("Number").asText();
             String date = node.get("Date").asText();
+            String posted = "";
 
             JsonNode operations = node.path("Операции");
             double time = 0d;
@@ -57,14 +58,20 @@ public class JsonParse {
             JsonNode product = node.path("Продукция");
             for (JsonNode prod : product) {
                 String result = request.doRequest(url.setUrl(DocType.Catalog_Номенклатура, "Ref_Key", prod.get("Номенклатура_Key").asText()));
+                String result2 = request.doRequest(url.setUrl(DocType.Document_СборкаЗапасов, "ЗаказНаПроизводство_Key", refkey));
                 try {
-                    list.add(jsonParseNum(result));
+                    list.add(jsonParseData(result, "НаименованиеПолное"));
+                    posted = jsonParseData(result2, "Posted");
+                    date = jsonParseData(result2, "Date");
+
                 } catch (JsonProcessingException e) {
                     log.error(e.getMessage());
                     throw new RuntimeException(e);
                 }
 
+
             }
+
             LocalDateTime dateTime = LocalDateTime.parse(date);
             if (timeCalc.checkDate(dateTime, period)) {
                 ZNP znp = new ZNP();
@@ -73,24 +80,25 @@ public class JsonParse {
                 znp.setTotalTime(time);
                 znp.setDate(dateTime);
                 znp.setList(list);
+                znp.setPosted(Boolean.parseBoolean(posted));
 
                 znpList.add(znp);
             }
         }
     }
 
-    public String jsonParseNum(String json) throws JsonProcessingException {
+    public String jsonParseData(String json, String field) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootArray = objectMapper.readTree(json);
         JsonNode valueArray = rootArray.get("value");
 
-        String name = "";
+        String data = "";
         for (JsonNode node : valueArray) {
-            name = node.path("НаименованиеПолное").asText();
+            data = node.path(field).asText();
         }
 
-        return name;
+        return data;
     }
 
 

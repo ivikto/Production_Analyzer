@@ -13,6 +13,8 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 @SpringBootApplication
@@ -58,10 +60,14 @@ public class Main {
         String response = myRequest.doRequest(url);
         jsonParse.jsonParseProd(response, Period.Month);
         znpList = jsonParse.getZnpList();
+        znpList = znpList.stream()
+                .filter(znp -> !znp.isPosted())
+                .collect(Collectors.toList());
         for (ZNP znp : znpList) {
-            TimeCalc.calculateTime(znp);
-            output.printResult(znp);
+                TimeCalc.calculateTime(znp);
+                output.printResult(znp);
         }
+
 
         output.printRatio(znpList);
         excelWrite.createExcel(znpList);
