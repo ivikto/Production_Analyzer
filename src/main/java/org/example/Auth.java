@@ -19,16 +19,16 @@ public class Auth {
     @Value(value = "${pass}")
     private String pass; // Логин и пароль
     @Getter
-    private String auth = login + ":" + pass;
+    private String authInfo = login + ":" + pass;
     @Getter
-    private String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+    private String encodedAuth = Base64.getEncoder().encodeToString(authInfo.getBytes(StandardCharsets.UTF_8));
 
 
     @PostConstruct
     public void init() {
         // Инициализируем поля после внедрения значений
-        this.auth = login + ":" + pass;
-        this.encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        this.authInfo = login + ":" + pass;
+        this.encodedAuth = Base64.getEncoder().encodeToString(authInfo.getBytes(StandardCharsets.UTF_8));
     }
 
     public String getAuthInfo() {

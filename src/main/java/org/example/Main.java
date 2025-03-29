@@ -29,11 +29,7 @@ public class Main {
     private final Output output;
 
     @Getter
-    public static List<ZNP> znpList;
-
-    static {
-        znpList = new ArrayList<>();
-    }
+    public List<ZNP> znpList = new ArrayList<>();
 
     @Autowired
     public Main(MyURL myURL, ExcelWrite excelWrite, JsonParse jsonParse, MyRequest myRequest, Output output) {

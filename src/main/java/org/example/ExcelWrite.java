@@ -1,5 +1,6 @@
 package org.example;
 
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -15,7 +16,7 @@ import java.util.List;
 public class ExcelWrite {
 
 
-    private static final String filePath = "C:\\Java\\Production_Analyzer\\prod_data.xlsx";
+    private static final String FILE_PATH = "C:\\Java\\Production_Analyzer\\prod_data.xlsx";
 
 
     public void createExcel(List<ZNP> znpList) {
@@ -29,6 +30,7 @@ public class ExcelWrite {
     // Метод для записи данных в Excel
     private void writeToExcel(List<ZNP> znpList) throws IOException {
         // Создаем новую книгу Excel
+        @Cleanup
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Производства за месяц");
 
@@ -116,7 +118,7 @@ public class ExcelWrite {
         }
 
         // Записываем файл
-        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+        try (FileOutputStream fileOut = new FileOutputStream(FILE_PATH)) {
             workbook.write(fileOut);
         }
 

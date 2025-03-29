@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @SpringBootTest
-public class AuthTest {
+class AuthTest {
 
     @Autowired
     public Auth auth;
