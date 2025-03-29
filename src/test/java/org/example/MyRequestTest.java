@@ -46,7 +46,8 @@ public class MyRequestTest {
 
     @Test
     void TestdoRequest2() throws IOException {
-        String response = myRequest.doRequest(myUrl);
+        myRequest.setUrl(myUrl);
+        String response = myRequest.doRequest();
         assertNotNull(response, "Response не должен быть null");
         assertFalse(response.isEmpty(), "Response не должен быть пустым");
     }

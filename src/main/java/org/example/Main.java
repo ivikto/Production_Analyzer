@@ -48,33 +48,33 @@ public class Main {
         ApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
         Main main = context.getBean(Main.class);
         log.info("main start");
+        LocalTime now = LocalTime.now();
         main.run();
+        LocalTime finish = LocalTime.now();
+        Duration duration = Duration.between(now, finish);
+        log.info("Продолжительность операции: " + duration.toSeconds() + " сек");
     }
 
     public void run() {
-        LocalTime now = LocalTime.now();
 
         log.info("main run");
         String url = myURL.setUrl(DocType.Document_ЗаказНаПроизводство, FieldType.СостояниеЗаказа_Key, "4f5e06a1-5f73-11ed-a1fd-d2166770609f");
         log.info(url);
-        String response = myRequest.doRequest(url);
+        myRequest.setUrl(url);
+        String response = myRequest.doRequest();
         jsonParse.jsonParseProd(response, Period.Month);
         znpList = jsonParse.getZnpList();
         znpList = znpList.stream()
                 .filter(znp -> !znp.isPosted())
-                .collect(Collectors.toList());
+                .toList();
         for (ZNP znp : znpList) {
-                TimeCalc.calculateTime(znp);
-                output.printResult(znp);
+            TimeCalc.calculateTime(znp);
+            output.printResult(znp);
         }
 
 
         output.printRatio(znpList);
         excelWrite.createExcel(znpList);
-
-        LocalTime finish = LocalTime.now();
-        Duration duration = Duration.between(now, finish);
-        log.info("Продолжительность операции: " + duration.toSeconds() + " сек");
 
     }
 }

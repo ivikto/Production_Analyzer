@@ -1,0 +1,3 @@
+login=LOGIN for ODATA
+pass=PASSWORD for ODATA
+baseUrl=ODATA_LINK LIKE https://example.com/UNF/odata/standard.odata/ 

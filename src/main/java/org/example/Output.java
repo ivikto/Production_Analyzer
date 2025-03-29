@@ -13,23 +13,25 @@ public class Output {
 
     public void printResult(ZNP znp) {
         double rounded = Math.round(znp.getTotalTime() * 1000.0) / 1000.0;
+        String status;
         if (znp.isViolation()) {
-            String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
-                    " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
-                    " Времени выделено: " + rounded + " часа" +
-                    " НАРУШЕНИЕ" +
-                    " Изделия: " + znp.getList() +
-                    " Posted: " + znp.posted);
-            log.info(str);
+            status = "НАРУШЕНИЕ";
+
         } else {
-            String str = String.format(znp.getNumber() + " Создан: " + formatDateTime(znp.getDate()) +
-                    " Должен быть завершен: " + formatDateTime(znp.getDeadline()) +
-                    " Времени выделено: " + rounded + " часа" +
-                    " НОРМА" +
-                    " Изделия: " + znp.getList() +
-                    " Posted: " + znp.posted);
-            log.info(str);
+            status = "НОРМА";
+
         }
+        String str = String.format(
+                "%s Создан: %s Должен быть завершен: %s Времени выделено: %.1f часа %s Изделия: %s Posted: %s",
+                znp.getNumber(),
+                formatDateTime(znp.getDate()),
+                formatDateTime(znp.getDeadline()),
+                rounded,
+                status,
+                znp.getList(),
+                znp.isPosted()
+        );
+        log.info(str);
     }
     public void printRatio(List<ZNP> znpList) {
         long violations = znpList.stream()
