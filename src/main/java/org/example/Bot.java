@@ -32,6 +32,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     private Main main;
     private Output output;
     private ExcelWrite excelWrite;
+    private Runner runner;
 
     @PostConstruct
     public void init() {
@@ -42,10 +43,11 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     }
 
     @Autowired // Инъекция через сеттер
-    public Bot(Main main, Output output, ExcelWrite excelWrite) {
+    public Bot(Main main, Output output, ExcelWrite excelWrite, Runner runner) {
         this.main = main;
         this.output = output;
         this.excelWrite = excelWrite;
+        this.runner = runner;
     }
 
 
@@ -60,9 +62,9 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
             if (message_text.equalsIgnoreCase("getinfo")) {
                 log.info("Запрос GetInfo из Telegram");
                 sendMessage("Выполняется запрос, ожидайте...", chat_id);
-                main.run();
+                runner.run();
 
-                List<ZNP> znpList = main.getZnpList();
+                List<ZNP> znpList = runner.getZnpList();
                 for (ZNP znp : znpList) {
                     String result = output.getResult(znp);
                     sendMessage(result, chat_id);
