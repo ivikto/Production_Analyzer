@@ -16,7 +16,7 @@ public class MyThread implements Callable<String> {
     }
 
     @Override
-    public String call() throws Exception {
+    public String call() {
         return request.doRequest();
     }
 }

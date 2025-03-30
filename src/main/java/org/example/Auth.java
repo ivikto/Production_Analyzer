@@ -31,7 +31,4 @@ public class Auth {
         this.encodedAuth = Base64.getEncoder().encodeToString(authInfo.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String getAuthInfo() {
-        return encodedAuth;
-    }
 }

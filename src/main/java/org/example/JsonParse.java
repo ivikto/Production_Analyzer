@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 @Component
 public class JsonParse {
     @Getter
-    private final List<ZNP> znpList = new ArrayList<>();
+    private List<ZNP> znpList;
     private final MyRequest request;
     private final TimeCalc timeCalc;
     private final MyURL url;
@@ -33,6 +33,7 @@ public class JsonParse {
 
     //Парсим и находим значением полей производсв со статусом - В работе
     public void jsonParseProd(String json, Period period) {
+        znpList = new ArrayList<>();
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootArray;

@@ -1,10 +1,13 @@
 package org.example;
 
 import lombok.Cleanup;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
@@ -13,10 +16,13 @@ import java.util.List;
 
 @Slf4j
 @Component
+@PropertySource("classpath:jsonPars.properties")
 public class ExcelWrite {
 
+    @Value("${filePath}")
+    @Getter
+    private String filePath;
 
-    private static final String FILE_PATH = "C:\\Java\\Production_Analyzer\\prod_data.xlsx";
 
 
     public void createExcel(List<ZNP> znpList) {
@@ -51,10 +57,9 @@ public class ExcelWrite {
         CellStyle boldStyle = workbook.createCellStyle();
         boldStyle.setFont(boldFont);
         headerFont.setBold(false);
-        headerStyle.setFont(headerFont);
-        headerStyle.setAlignment(HorizontalAlignment.CENTER);
-        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-
+        dataStyle.setFont(headerFont);
+        dataStyle.setAlignment(HorizontalAlignment.CENTER);
+        dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
         // Стиль для дат
         CellStyle dateStyle = workbook.createCellStyle();
@@ -96,16 +101,16 @@ public class ExcelWrite {
         for (ZNP znp : znpList) {
             Row row = sheet.createRow(rowNum++);
             row.setRowStyle(dataStyle);
-            row.createCell(0).setCellValue(rowNum - 1);
+            row.createCell(0).setCellValue(rowNum - 2);
             row.createCell(1).setCellValue(znp.getNumber());
             Cell cell2 = row.createCell(2);
             cell2.setCellStyle(dateStyle);
             cell2.setCellValue(znp.getDate());
             Cell cell3 = row.createCell(3);
-            cell3.setCellStyle(dataStyle);
+            cell3.setCellStyle(dateStyle);
             cell3.setCellValue(znp.getDeadline());
             Cell cell4 = row.createCell(4);
-            cell4.setCellStyle(dateStyle);
+            cell4.setCellStyle(dataStyle);
             cell4.setCellValue(znp.getTotalTime());
             row.createCell(5).setCellValue(znp.isViolation());
             row.createCell(6).setCellValue(znp.getList().toString());
@@ -118,7 +123,7 @@ public class ExcelWrite {
         }
 
         // Записываем файл
-        try (FileOutputStream fileOut = new FileOutputStream(FILE_PATH)) {
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
             workbook.write(fileOut);
         }
 

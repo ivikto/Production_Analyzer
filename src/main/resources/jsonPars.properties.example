@@ -1,3 +1,5 @@
 login=LOGIN for ODATA
 pass=PASSWORD for ODATA
 baseUrl=ODATA_LINK LIKE https://example.com/UNF/odata/standard.odata/ 
+filePath=C:\\....\\prod_data.xlsx
+botToken=12345:YOUR_TOKEN

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Getter
 @Component
@@ -37,9 +38,10 @@ public class MyRequest {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            connection.setRequestProperty("Authorization", "Basic " + auth.getAuthInfo());
+            connection.setRequestProperty("Authorization", "Basic " + auth.getEncodedAuth());
 
             responseCode = connection.getResponseCode();
+
 
             if (responseCode == 200) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
@@ -48,6 +50,8 @@ public class MyRequest {
                     response.append(line);
                 }
                 reader.close();
+            } else {
+                log.error("Request error, Response code: " + responseCode);
             }
 
         } catch (MalformedURLException e) {

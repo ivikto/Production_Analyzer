@@ -12,34 +12,43 @@ import static org.example.TimeCalc.formatDateTime;
 public class Output {
 
     public void printResult(ZNP znp) {
-        double rounded = Math.round(znp.getTotalTime() * 1000.0) / 1000.0;
-        String status;
-        if (znp.isViolation()) {
-            status = "НАРУШЕНИЕ";
+        log.info(getResult(znp));
+    }
 
-        } else {
-            status = "НОРМА";
-
-        }
-        String str = String.format(
+    public String getResult(ZNP znp) {
+        return String.format(
                 "%s Создан: %s Должен быть завершен: %s Времени выделено: %.1f часа %s Изделия: %s Posted: %s",
                 znp.getNumber(),
                 formatDateTime(znp.getDate()),
                 formatDateTime(znp.getDeadline()),
-                rounded,
-                status,
+                getRoundedTime(znp.getTotalTime()),
+                getStatus(znp.isViolation()),
                 znp.getList(),
                 znp.isPosted()
         );
-        log.info(str);
     }
+
     public void printRatio(List<ZNP> znpList) {
-        long violations = znpList.stream()
+        log.info(getRatioMessage(znpList));
+    }
+
+
+    public String getRatioMessage(List<ZNP> znpList) {
+        long violations = countViolations(znpList);
+        return String.format("Нарушены сроки по %d из %d производств", violations, znpList.size());
+    }
+
+    private long countViolations(List<ZNP> znpList) {
+        return znpList.stream()
                 .filter(ZNP::isViolation)
                 .count();
-        String str = String.format("Нарушены сроки по %d из %d производств", violations, znpList.size());
-        log.info(str);
+    }
 
+    private double getRoundedTime(double totalTime) {
+        return Math.round(totalTime * 10.0) / 10.0; // Округление до 1 знака после запятой
+    }
 
+    private String getStatus(boolean isViolation) {
+        return isViolation ? "НАРУШЕНИЕ" : "НОРМА";
     }
 }
