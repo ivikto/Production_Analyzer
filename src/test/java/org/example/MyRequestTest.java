@@ -38,7 +38,7 @@ public class MyRequestTest {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Basic " + auth.getAuthInfo());
+        connection.setRequestProperty("Authorization", "Basic " + auth.getEncodedAuth());
         int responseCode = connection.getResponseCode();
 
         assertEquals(200, responseCode);

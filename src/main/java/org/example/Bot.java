@@ -18,7 +18,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -29,7 +28,6 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     @Value("${botToken}")
     private String botToken;
     private TelegramClient telegramClient;
-    private Main main;
     private Output output;
     private ExcelWrite excelWrite;
     private Runner runner;
@@ -43,8 +41,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     }
 
     @Autowired // Инъекция через сеттер
-    public Bot(Main main, Output output, ExcelWrite excelWrite, Runner runner) {
-        this.main = main;
+    public Bot(Output output, ExcelWrite excelWrite, Runner runner) {
         this.output = output;
         this.excelWrite = excelWrite;
         this.runner = runner;
