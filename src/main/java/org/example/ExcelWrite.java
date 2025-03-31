@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -121,6 +123,8 @@ public class ExcelWrite {
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
         }
+
+        Files.createDirectories(Path.of(filePath).getParent());
 
         // Записываем файл
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
