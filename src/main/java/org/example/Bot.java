@@ -9,15 +9,22 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -38,44 +45,101 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
             throw new IllegalStateException("botToken is null");
         }
         telegramClient = new OkHttpTelegramClient(botToken);
+        registerCommands(); // Регистрируем команды при инициализации
     }
 
-    @Autowired // Инъекция через сеттер
+    @Autowired
     public Bot(Output output, ExcelWrite excelWrite, Runner runner) {
         this.output = output;
         this.excelWrite = excelWrite;
         this.runner = runner;
     }
 
+    private void registerCommands() {
+        List<BotCommand> commands = new ArrayList<>();
+        commands.add(new BotCommand("/start", "Начать работу с ботом"));
+        commands.add(new BotCommand("/getinfo", "Получить информацию и отчет"));
+
+        try {
+            telegramClient.execute(new SetMyCommands(commands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при регистрации команд меню", e);
+        }
+    }
 
     @Override
     public void consume(Update update) {
-        // We check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
-            // Set variables
-            String message_text = update.getMessage().getText();
-            long chat_id = update.getMessage().getChatId();
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
 
-            if (message_text.equalsIgnoreCase("getinfo")) {
-                log.info("Запрос GetInfo из Telegram");
-                sendMessage("Выполняется запрос, ожидайте...", chat_id);
-                runner.run();
-
-                List<ZNP> znpList = runner.getZnpList();
-                for (ZNP znp : znpList) {
-                    String result = output.getResult(znp);
-                    sendMessage(result, chat_id);
-                }
-                String ratio = output.getRatioMessage(znpList);
-                sendMessage(ratio, chat_id);
-                sendFile(chat_id);
-
+            if (messageText.equalsIgnoreCase("/start")) {
+                sendWelcomeMessage(chatId);
+            }
+            else if (messageText.equalsIgnoreCase("/getinfo") || messageText.equalsIgnoreCase("getinfo")) {
+                handleGetInfoCommand(chatId);
             } else {
-                sendMessage(message_text, chat_id);
+                log.info("Боту пришло сообщение: " + messageText);
+            }
+        }
+    }
+
+    private void sendWelcomeMessage(long chatId) {
+        String welcomeText = "Добро пожаловать!\n\n" +
+                "Доступные команды:\n" +
+                "/getinfo - Получить информацию и отчет\n\n" +
+                "Или нажмите кнопку ниже:";
+
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(welcomeText)
+                .replyMarkup(createMainMenuKeyboard())
+                .build();
+
+        try {
+            telegramClient.execute(message);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке приветственного сообщения", e);
+        }
+    }
+
+    private ReplyKeyboardMarkup createMainMenuKeyboard() {
+        // Создаем список рядов кнопок
+        KeyboardRow row = new KeyboardRow();
+        row.add("📊 Получить отчет");
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        keyboard.add(row);
+
+        // Создаем клавиатуру через билдер
+        return ReplyKeyboardMarkup.builder()
+                .keyboard(keyboard)
+                .resizeKeyboard(true)  // Подгоняем размер кнопок
+                .oneTimeKeyboard(false) // Клавиатура остается после нажатия
+                .build();
+    }
+
+    private void handleGetInfoCommand(long chatId) {
+        log.info("Запрос GetInfo из Telegram");
+        sendMessage("Выполняется запрос, ожидайте...", chatId);
+
+        try {
+            runner.run();
+            List<ZNP> znpList = runner.getZnpList();
+
+            for (ZNP znp : znpList) {
+                String result = output.getResult(znp);
+                sendMessage(result, chatId);
             }
 
-        }
+            String ratio = output.getRatioMessage(znpList);
+            sendMessage(ratio, chatId);
+            sendFile(chatId);
 
+        } catch (Exception e) {
+            log.error("Ошибка при выполнении команды getinfo", e);
+            sendMessage("Произошла ошибка при выполнении запроса", chatId);
+        }
     }
 
     @Override

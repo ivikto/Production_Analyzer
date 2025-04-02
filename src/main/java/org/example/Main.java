@@ -17,9 +17,7 @@ import java.util.Scanner;
 @PropertySource("classpath:jsonPars.properties")
 public class Main {
 
-
     private final Runner runner;
-
 
     @Autowired
     public Main(Runner runner) {

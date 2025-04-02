@@ -36,3 +36,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Игнорировать файлы конфигурации с чувствительными данными
+src/main/resources/jsonPars.properties
+# Игнорировать папку с логами
+logs/
