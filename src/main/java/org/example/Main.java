@@ -3,8 +3,10 @@ package org.example;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 
 @Slf4j
-@Component
 @SpringBootApplication
 @PropertySource("classpath:jsonPars.properties")
 public class Main {
@@ -26,7 +27,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+
+        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
         Main main = context.getBean(Main.class);
         @Cleanup
         Scanner scanner = new Scanner(System.in);

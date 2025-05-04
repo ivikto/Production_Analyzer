@@ -34,7 +34,7 @@ public class Runner {
         this.output = output;
     }
 
-    public void run() {
+    public List<ZNP> run() {
         log.info("Starting production analysis");
         LocalTime startTime = LocalTime.now();
 
@@ -55,6 +55,7 @@ public class Runner {
                     })
                     .toList();
 
+
             output.printRatio(znpList);
             excelWrite.createExcel(znpList);
 
@@ -64,5 +65,6 @@ public class Runner {
             log.error("Error during production analysis", e);
             throw new RuntimeException("Failed to execute production analysis", e);
         }
+        return znpList;
     }
 }

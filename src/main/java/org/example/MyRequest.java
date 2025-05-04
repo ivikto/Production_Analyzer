@@ -51,7 +51,7 @@ public class MyRequest {
                 }
                 reader.close();
             } else {
-                log.error("Request error, Response code: " + responseCode);
+                log.error("Request error, Response code: {}", responseCode);
             }
 
         } catch (MalformedURLException e) {
